@@ -1,6 +1,6 @@
 module github.com/bincooo/completion-flags
 
-go 1.21.6
+go 1.20
 
 require (
 	github.com/bincooo/chatgpt-adapter/v2 v2.0.0
