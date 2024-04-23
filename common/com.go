@@ -59,7 +59,7 @@ func CoverMessages(ctx *gin.Context, messages []interface{}) (err error) {
 }
 
 func IsCompletion(ctx *gin.Context) bool {
-	return strings.HasSuffix(ctx.Request.RequestURI, "/v1/chat/completions")
+	return strings.Contains(ctx.Request.RequestURI, "/v1/chat/completions")
 }
 
 func extractMessage(message map[string]interface{}) *string {
