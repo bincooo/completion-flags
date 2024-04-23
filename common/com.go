@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ExtractMessages(ctx *gin.Context) (messages []map[string]interface{}, err error) {
+func ExtractMessages(ctx *gin.Context) (messages []interface{}, err error) {
 	var obj map[string]interface{}
 	bio, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
@@ -22,7 +22,7 @@ func ExtractMessages(ctx *gin.Context) (messages []map[string]interface{}, err e
 	}
 
 	if msgs, ok := obj["messages"]; ok {
-		if m, o := msgs.([]map[string]interface{}); o {
+		if m, o := msgs.([]interface{}); o {
 			if len(m) == 0 {
 				return nil, errors.New("field messages is required")
 			}
@@ -34,7 +34,7 @@ func ExtractMessages(ctx *gin.Context) (messages []map[string]interface{}, err e
 	return nil, errors.New("field messages is required")
 }
 
-func CoverMessages(ctx *gin.Context, messages []map[string]interface{}) (err error) {
+func CoverMessages(ctx *gin.Context, messages []interface{}) (err error) {
 	value, exists := ctx.Get(BYTES_FIELD)
 	if !exists {
 		return

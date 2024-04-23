@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]interface{}) {
+func XmlFlags(messages []interface{}) (newMessages []interface{}) {
 	if len(messages) == 0 {
 		return nil
 	}
@@ -44,8 +44,12 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 
 			c := regexp.MustCompile(cmp, regexp.Compiled)
 			for idx, message := range messages {
-				if idx < pos && message["role"] != "system" {
-					str := extractMessage(message)
+				m, ok := message.(map[string]interface{})
+				if !ok {
+					continue
+				}
+				if idx < pos && m["role"] != "system" {
+					str := extractMessage(m)
 					if str == nil {
 						continue
 					}
@@ -56,7 +60,7 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 						continue
 					}
 
-					message["content"] = replace
+					m["content"] = replace
 				}
 			}
 		}
@@ -84,15 +88,20 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 				}
 			}
 
+			message, ok := messages[pos].(map[string]interface{})
+			if !ok {
+				continue
+			}
+
 			if h['r'] == "" {
-				str := extractMessage(messages[pos])
+				str := extractMessage(message)
 				if str == nil {
 					continue
 				}
-				messages[pos]["content"] = *str + "\n\n" + h['v']
+				message["content"] = *str + "\n\n" + h['v']
 			} else {
-				messages = append(messages[:pos+1], append([]map[string]interface{}{
-					{
+				messages = append(messages[:pos+1], append([]interface{}{
+					map[string]string{
 						"role":    h['r'],
 						"content": h['v'],
 					},
@@ -106,7 +115,7 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 			if len(content) < 2 || content[0] != '[' || content[len(content)-1] != ']' {
 				continue
 			}
-			var pMessages []map[string]interface{}
+			var pMessages []interface{}
 			if e := json.Unmarshal([]byte(content), &pMessages); e != nil {
 				logrus.Error("histories flags handle failed: ", e)
 				continue
@@ -117,7 +126,11 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 			}
 
 			for idx := 0; idx < len(messages); idx++ {
-				if !strings.Contains("|system|function|", messages[idx]["role"].(string)) {
+				message, ok := messages[idx].(map[string]interface{})
+				if !ok {
+					continue
+				}
+				if !strings.Contains("|system|function|", message["role"].(string)) {
 					messages = append(messages[:idx], append(pMessages, messages[idx:]...)...)
 					break
 				}
@@ -130,7 +143,7 @@ func XmlFlags(messages []map[string]interface{}) (newMessages []map[string]inter
 	return
 }
 
-func xmlFlagsToContents(messages []map[string]interface{}) (handles []map[uint8]string) {
+func xmlFlagsToContents(messages []interface{}) (handles []map[uint8]string) {
 	var (
 		parser = XmlParser{[]string{
 			"regex",
@@ -140,18 +153,23 @@ func xmlFlagsToContents(messages []map[string]interface{}) (handles []map[uint8]
 	)
 
 	for _, message := range messages {
-		role := message["role"]
+		m, ok := message.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		role := m["role"]
 		if role != "system" && role != "user" {
 			continue
 		}
 
-		str := extractMessage(message)
+		str := extractMessage(m)
 		if str == nil {
 			continue
 		}
 
 		clean := func(ctx string) {
-			message["content"] = strings.Replace(*str, ctx, "", -1)
+			m["content"] = strings.Replace(*str, ctx, "", -1)
 		}
 
 		content := *str
