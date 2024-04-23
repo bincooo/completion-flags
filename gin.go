@@ -8,6 +8,7 @@ import (
 
 func EmbedFlags(ctx *gin.Context) {
 	if !common.IsCompletion(ctx) {
+		ctx.Next()
 		return
 	}
 
@@ -26,4 +27,6 @@ func EmbedFlags(ctx *gin.Context) {
 		})
 		return
 	}
+
+	ctx.Next()
 }

@@ -1,9 +1,8 @@
 module github.com/bincooo/completion-flags
 
-go 1.20
+go 1.21.6
 
 require (
-	github.com/bincooo/chatgpt-adapter/v2 v2.0.0
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/sirupsen/logrus v1.9.3
