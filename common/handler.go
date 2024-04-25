@@ -168,8 +168,10 @@ func xmlFlagsToContents(messages []interface{}) (handles []map[uint8]string) {
 			continue
 		}
 
-		clean := func(ctx string) {
-			m["content"] = strings.Replace(*str, ctx, "", -1)
+		clean := func(content string) {
+			value := strings.Replace(*str, content, "", -1)
+			m["content"] = value
+			str = &value
 		}
 
 		content := *str
