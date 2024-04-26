@@ -1,13 +1,6 @@
 package common
 
-import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"github.com/gin-gonic/gin"
-	"io"
-	"strings"
-)
+import "strings"
 
 func extractMessage(message map[string]interface{}) *string {
 	var str string
