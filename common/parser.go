@@ -1,7 +1,6 @@
 package common
 
 import (
-	"bytes"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/sirupsen/logrus"
 	"strconv"
@@ -12,8 +11,6 @@ const (
 	XML_TYPE_S = iota // 普通字符串
 	XML_TYPE_X        // XML标签
 	XML_TYPE_I        // 注释标签
-
-	BYTES_FIELD = "__BYTES_FILED__"
 )
 
 type xNode struct {
@@ -27,16 +24,8 @@ type xNode struct {
 	child   []xNode
 }
 
-type BytesReadCloser struct {
-	*bytes.Reader
-}
-
 type XmlParser struct {
 	whiteList []string
-}
-
-func (BytesReadCloser) Close() error {
-	return nil
 }
 
 func trimCdata(value string) string {
